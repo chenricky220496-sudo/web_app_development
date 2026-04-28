@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}首頁 - 食譜收藏夾{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6 mb-3 mb-md-0">
+        <h2 class="fw-bold mb-0">{% if current_tag %}「{{ current_tag }}」分類下的食譜{% elif current_q %}搜尋「{{ current_q }}」的結果{% else %}我的食譜庫{% endif %}</h2>
+    </div>
+    <div class="col-md-6">
+        <form class="d-flex" action="{{ url_for('routes.index') }}" method="GET">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input class="form-control border-start-0" type="search" name="q" placeholder="搜尋食譜或食材..." value="{{ current_q }}">
+                <button class="btn btn-outline-primary" type="submit">搜尋</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tags filter -->
+{% if tags %}
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ url_for('routes.index') }}" class="badge {% if not current_tag %}bg-primary{% else %}bg-secondary text-decoration-none{% endif %}">全部</a>
+    {% for t in tags %}
+        <a href="{{ url_for('routes.index', tag=t.name) }}" class="badge {% if current_tag == t.name %}bg-primary{% else %}bg-secondary text-decoration-none{% endif %}">{{ t.name }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if recipes %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for r in recipes %}
+    <div class="col">
+        <div class="recipe-card">
+            <a href="{{ url_for('routes.recipe_detail', id=r.id) }}">
+                {% if r.image_path %}
+                <img src="{{ url_for('static', filename='images/' ~ r.image_path) }}" class="card-img-top" alt="{{ r.title }}">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted">
+                    <i class="bi bi-image" style="font-size: 3rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ r.title }}</h5>
+                    <p class="card-text text-muted small text-truncate">{{ r.ingredients }}</p>
+                    <div class="d-flex flex-wrap gap-1 mt-2">
+                        {% for tag in r.tags %}
+                        <span class="badge bg-secondary">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-inbox text-muted mb-3" style="font-size: 4rem;"></i>
+    <h3 class="text-muted">找不到相符的食譜</h3>
+    <p class="text-muted mb-4">試著換個關鍵字搜尋，或是新增一道食譜吧！</p>
+    <a href="{{ url_for('routes.new_recipe') }}" class="btn btn-primary">新增第一道食譜</a>
+</div>
+{% endif %}
+{% endblock %}

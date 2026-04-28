@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} - 食譜收藏夾{% endblock %}
+
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <a href="{{ url_for('routes.index') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>返回列表
+    </a>
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-gear me-1"></i>操作
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{{ url_for('routes.edit_recipe', id=recipe.id) }}"><i class="bi bi-pencil me-2 text-primary"></i>編輯</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form action="{{ url_for('routes.delete_recipe', id=recipe.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('確定要刪除這道食譜嗎？此操作無法還原。');">
+                        <i class="bi bi-trash me-2"></i>刪除
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-5 mb-4">
+        <div class="recipe-header">
+            {% if recipe.image_path %}
+            <img src="{{ url_for('static', filename='images/' ~ recipe.image_path) }}" alt="{{ recipe.title }}">
+            {% else %}
+            <div class="bg-light d-flex align-items-center justify-content-center text-muted w-100" style="height: 300px;">
+                <i class="bi bi-image" style="font-size: 4rem;"></i>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="content-section">
+            <h3>所需食材</h3>
+            {% if recipe.ingredients %}
+            <div style="white-space: pre-wrap;">{{ recipe.ingredients }}</div>
+            {% else %}
+            <p class="text-muted fst-italic">尚未填寫食材</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-lg-7">
+        <div class="content-section">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h1 class="fw-bold mb-0 text-dark">{{ recipe.title }}</h1>
+            </div>
+            
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                {% for tag in recipe.tags %}
+                <span class="badge bg-secondary fs-6">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+            
+            {% if recipe.source_url %}
+            <div class="mb-4">
+                <a href="{{ recipe.source_url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-link-45deg me-1"></i>查看原始來源
+                </a>
+            </div>
+            {% endif %}
+
+            <h3>製作步驟</h3>
+            {% if recipe.instructions %}
+            <div style="white-space: pre-wrap; font-size: 1.1rem;">{{ recipe.instructions }}</div>
+            {% else %}
+            <p class="text-muted fst-italic">尚未填寫步驟</p>
+            {% endif %}
+        </div>
+        
+        <p class="text-muted small text-end mt-3">建立時間：{{ recipe.created_at }}</p>
+    </div>
+</div>
+{% endblock %}
